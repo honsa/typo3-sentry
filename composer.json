@@ -1,5 +1,5 @@
 {
-	"name": "honsa/sentry",
+	"name": "honsa/typo3-sentry",
 	"description": "Sentry",
 	"type": "typo3-cms-extension",
 	"license": "MIT",

@@ -12,7 +12,7 @@ A TYPO3 13 extension that forwards TYPO3 logs to Sentry via a configurable custo
 Require the package via Composer and activate the extension in TYPO3:
 
 ```bash
-composer require honsa/sentry
+composer require honsa/typo3-sentry
 ```
 
 TYPO3 extension key: `sentry_logger`
