@@ -1,5 +1,5 @@
 
-# Sentry Logger
+# Sentry Logger for TYPO3 CMS
 
 A TYPO3 13 extension that forwards TYPO3 logs to Sentry via a configurable custom LogWriter.
 
