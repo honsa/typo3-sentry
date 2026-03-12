@@ -84,5 +84,21 @@ Run the package tests from the package directory:
 composer test
 ```
 
+Run static analysis for the `Classes` directory with PHPStan:
 
+```bash
+composer phpstan
+```
+
+Check coding standards for `Classes` and `Tests` without changing files:
+
+```bash
+composer cs:lint
+```
+
+Automatically fix coding standards issues in `Classes` and `Tests` where possible:
+
+```bash
+composer cs:fix
+```
 
