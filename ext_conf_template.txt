@@ -7,3 +7,27 @@ features.enable = 1
 # cat=connection/dsn; type=string; label=Sentry DSN (leave empty to use env SENTRY_DSN)
 connection.dsn =
 
+# cat=connection/environment; type=string; label=Sentry environment (optional; defaults to SENTRY_ENVIRONMENT/APP_ENV/production)
+connection.environment =
+
+# cat=connection/release; type=string; label=Sentry release identifier (optional; defaults to SENTRY_RELEASE)
+connection.release =
+
+# cat=sampling/tracesSampleRate; type=double2; label=Trace sample rate between 0.0 and 1.0
+sampling.tracesSampleRate = 0.0
+
+# cat=sampling/profilesSampleRate; type=double2; label=Profile sample rate between 0.0 and 1.0
+sampling.profilesSampleRate = 0.0
+
+# cat=filter/enabledLogLevels; type=string; label=Comma separated PSR-3 log levels to forward
+filter.enabledLogLevels = debug,info,notice,warning,error,critical,alert,emergency
+
+# cat=filter/captureExceptionsOnly; type=boolean; label=Only forward records with an exception in the log context
+filter.captureExceptionsOnly = 0
+
+# cat=context/staticTags; type=string; label=Semicolon separated static tags (key:value;key:value). Do not store secrets here.
+context.staticTags =
+
+# cat=context/staticExtras; type=string; label=Semicolon separated static extras (key:value;key:value). Secret-like keys are redacted automatically.
+context.staticExtras =
+
