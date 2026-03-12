@@ -23,13 +23,11 @@ The extension reads its configuration from the Extension Configuration (Install 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
 | features.enable | boolean | 1 | Enable Sentry log forwarding. Set to 0 to disable processing. |
-| features.enableTestPlugin | boolean | 0 | Enable the Sentry test plugin/UI (frontend plugin and backend test module). |
 | connection.dsn | string | (empty) | Sentry DSN. If empty, the writer will try env `SENTRY_DSN` and will be effectively disabled without a DSN. |
 
 Notes:
 
-- If `features.enable = 0` or no DSN is available, the writer short-circuits and does nothing.
-- Exceptions present in `context['exception']` are captured via `captureException`; otherwise messages use `captureMessage` with mapped Sentry severity.
+If `features.enable = 0` or no DSN is available, the writer short-circuits and does nothing.
 
 
 ## Enable the writer
@@ -63,8 +61,6 @@ Run the package tests from the package directory:
 ```bash
 composer test
 ```
-
-Manual frontend test (optional): set a DSN and environment visible to PHP, enable the test plugin (either via extension settings or `SENTRY_TEST_PLUGIN=1`) and use the Test plugin to trigger sample events.
 
 
 
