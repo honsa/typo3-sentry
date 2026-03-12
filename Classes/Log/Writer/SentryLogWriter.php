@@ -71,7 +71,7 @@ class SentryLogWriter extends AbstractWriter
         $this->hub = SentrySdk::getCurrentHub();
     }
 
-    public function writeLog(LogRecord $record)
+    public function writeLog(LogRecord $record): \TYPO3\CMS\Core\Log\Writer\WriterInterface|static
     {
         try {
             if (!$this->enabled || SentrySdk::getCurrentHub()->getClient() === null) {

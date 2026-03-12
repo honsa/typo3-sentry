@@ -35,14 +35,12 @@ class SentryLogWriterTest extends TestCase
     private function setProperty(object $object, string $propertyName, mixed $value): void
     {
         $reflection = new \ReflectionProperty($object, $propertyName);
-        $reflection->setAccessible(true);
         $reflection->setValue($object, $value);
     }
 
     private function getProperty(object $object, string $propertyName): mixed
     {
         $reflection = new \ReflectionProperty($object, $propertyName);
-        $reflection->setAccessible(true);
         return $reflection->getValue($object);
     }
 
@@ -59,7 +57,7 @@ class SentryLogWriterTest extends TestCase
         self::assertSame($writer, $writer->writeLog($record));
         $getter = \Closure::bind(function (string $name) {
             return $this->$name;
-        }, $writer, get_class($writer));
+        }, $writer, \get_class($writer));
         self::assertFalse($getter('enabled'));
     }
 
@@ -68,7 +66,7 @@ class SentryLogWriterTest extends TestCase
         $writer = $this->make(['features' => ['enable' => 1], 'filter' => ['enabledLogLevels' => 'error,critical']]);
         $getter = \Closure::bind(function (string $name) {
             return $this->$name;
-        }, $writer, get_class($writer));
+        }, $writer, \get_class($writer));
         self::assertSame(['error', 'critical'], $getter('enabledLevels'));
         $writer->writeLog(new LogRecord('test', LogLevel::ERROR, 'Err'));
         $writer->writeLog(new LogRecord('test', LogLevel::INFO, 'Info'));
@@ -90,7 +88,7 @@ class SentryLogWriterTest extends TestCase
         self::assertTrue(true);
     }
 
-    public function testDefaultConfigurationForwardsInfoLevelMessages(): void
+    public function testDefaultConfigurationForwardsWarningLevelMessages(): void
     {
         $writer = $this->make(['features.enable' => 1]);
 
@@ -102,12 +100,12 @@ class SentryLogWriterTest extends TestCase
             ->willReturnCallback(static fn (callable $callback) => $callback(new Scope()));
         $hub->expects(self::once())
             ->method('captureMessage')
-            ->with('Info should reach Sentry', self::anything())
+            ->with('Warning should reach Sentry', self::anything())
             ->willReturn(null);
 
         $this->attachHub($writer, $hub);
 
-        self::assertSame($writer, $writer->writeLog(new LogRecord('test', LogLevel::INFO, 'Info should reach Sentry')));
+        self::assertSame($writer, $writer->writeLog(new LogRecord('test', LogLevel::WARNING, 'Warning should reach Sentry')));
     }
 
     public function testSensitiveContextKeysAreRedactedBeforeSendingToSentry(): void
@@ -141,7 +139,7 @@ class SentryLogWriterTest extends TestCase
                 'authorization' => 'Bearer token',
                 'safe' => 'visible',
             ],
-            'payload' => new class implements \JsonSerializable {
+            'payload' => new class () implements \JsonSerializable {
                 public function jsonSerialize(): mixed
                 {
                     return [
@@ -182,24 +180,24 @@ class SentryLogWriterTest extends TestCase
 
         $this->attachHub($writer, $hub);
 
-        $logFile = tempnam(sys_get_temp_dir(), 'sentry-writer-');
+        $logFile = \tempnam(\sys_get_temp_dir(), 'sentry-writer-');
         self::assertNotFalse($logFile);
 
-        $previousErrorLog = ini_get('error_log');
-        $previousLogErrors = ini_get('log_errors');
-        ini_set('log_errors', '1');
-        ini_set('error_log', $logFile);
+        $previousErrorLog = \ini_get('error_log');
+        $previousLogErrors = \ini_get('log_errors');
+        \ini_set('log_errors', '1');
+        \ini_set('error_log', $logFile);
 
         try {
             self::assertSame($writer, $writer->writeLog(new LogRecord('test', LogLevel::ERROR, 'Boom')));
 
-            $contents = (string)file_get_contents($logFile);
+            $contents = (string)\file_get_contents($logFile);
             self::assertStringContainsString('Failed to forward TYPO3 log record to Sentry', $contents);
             self::assertStringContainsString('RuntimeException - boom', $contents);
         } finally {
-            ini_set('log_errors', (string)$previousLogErrors);
-            ini_set('error_log', $previousErrorLog === false ? '' : (string)$previousErrorLog);
-            @unlink($logFile);
+            \ini_set('log_errors', (string)$previousLogErrors);
+            \ini_set('error_log', $previousErrorLog === false ? '' : (string)$previousErrorLog);
+            @\unlink($logFile);
         }
     }
 

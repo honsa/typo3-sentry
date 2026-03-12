@@ -20,7 +20,7 @@ sampling.tracesSampleRate = 0.0
 sampling.profilesSampleRate = 0.0
 
 # cat=filter/enabledLogLevels; type=string; label=Comma separated PSR-3 log levels to forward
-filter.enabledLogLevels = debug,info,notice,warning,error,critical,alert,emergency
+filter.enabledLogLevels = warning,error,critical,alert,emergency
 
 # cat=filter/captureExceptionsOnly; type=boolean; label=Only forward records with an exception in the log context
 filter.captureExceptionsOnly = 0

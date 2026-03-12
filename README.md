@@ -30,7 +30,7 @@ The extension reads its configuration from the Extension Configuration (Install 
 | connection.release | string | `SENTRY_RELEASE`, otherwise empty | Release identifier attached to Sentry events. |
 | sampling.tracesSampleRate | float | 0.0 | Trace sampling rate passed to the Sentry SDK. |
 | sampling.profilesSampleRate | float | 0.0 | Profile sampling rate passed to the Sentry SDK. |
-| filter.enabledLogLevels | string | `debug,info,notice,warning,error,critical,alert,emergency` | Comma-separated PSR-3 levels that are forwarded. |
+| filter.enabledLogLevels | string | `warning,error,critical,alert,emergency` | Comma-separated PSR-3 levels that are forwarded. |
 | filter.captureExceptionsOnly | boolean | 0 | If enabled, only records that contain an `exception` in the log context are forwarded. |
 | context.staticTags | string | (empty) | Semicolon-separated `key:value` tags added to every Sentry event. Avoid secrets. |
 | context.staticExtras | string | (empty) | Semicolon-separated `key:value` extras added to every Sentry event. Secret-like keys are redacted automatically. |
@@ -39,7 +39,7 @@ Notes:
 
 If `features.enable = 0` or no DSN is available, the writer short-circuits and does nothing.
 
-By default the writer forwards all PSR-3 log levels. To restrict traffic to Sentry, narrow `filter.enabledLogLevels` in the extension configuration.
+By default the writer forwards `warning` and above. To include `debug`, `info`, or `notice`, expand `filter.enabledLogLevels` in the extension configuration.
 
 Security behavior:
 

@@ -51,7 +51,6 @@ class ConfigurationTest extends TestCase
     private function getProperty(object $object, string $propertyName): mixed
     {
         $reflection = new \ReflectionProperty($object, $propertyName);
-        $reflection->setAccessible(true);
         return $reflection->getValue($object);
     }
 
@@ -298,24 +297,24 @@ class ConfigurationTest extends TestCase
     {
         $writer = $this->createWriter(['features.enable' => 1]);
         $levels = $this->getProperty($writer, 'enabledLevels');
-        // Default: all PSR-3 levels
+        // Default: warning and above
         self::assertIsArray($levels);
-        self::assertContains('debug', $levels);
-        self::assertContains('info', $levels);
-        self::assertContains('notice', $levels);
         self::assertContains('warning', $levels);
         self::assertContains('error', $levels);
         self::assertContains('critical', $levels);
         self::assertContains('alert', $levels);
         self::assertContains('emergency', $levels);
+        self::assertNotContains('debug', $levels);
+        self::assertNotContains('info', $levels);
+        self::assertNotContains('notice', $levels);
     }
 
     public function testFilterEnabledLogLevelsDefaultOrder(): void
     {
         $writer = $this->createWriter(['features.enable' => 1]);
         $levels = $this->getProperty($writer, 'enabledLevels');
-        // Verify all 8 PSR-3 levels are present by default
-        self::assertCount(8, $levels);
+        // Verify the 5 default warning-and-above levels are present
+        self::assertCount(5, $levels);
     }
 
     public function testFilterEnabledLogLevelsOnlyErrors(): void
