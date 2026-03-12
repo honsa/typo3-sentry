@@ -16,6 +16,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SentryLogWriter extends AbstractWriter
 {
+    private const REDACTED_VALUE = '[REDACTED]';
+    private const MAX_SANITIZE_DEPTH = 5;
+
     private HubInterface $hub;
     private array $config;
     private bool $enabled = true;
@@ -23,29 +26,35 @@ class SentryLogWriter extends AbstractWriter
     private bool $exceptionsOnly = false;
     private array $staticTags = [];
     private array $staticExtras = [];
+    private bool $disableInit = false;
+    private static bool $reportingInternalFailure = false;
 
     public function __construct(array $options = [])
     {
         // Extract internal test configuration before parent processing to avoid invalid option exception
         $internalConfig = [];
+        $hasInternalConfig = false;
         if (isset($options['__config']) && \is_array($options['__config'])) {
+            $hasInternalConfig = true;
             $internalConfig = $options['__config'];
             unset($options['__config']);
+        }
+        if (isset($options['__disableInit'])) {
+            $this->disableInit = (bool)$options['__disableInit'];
+            unset($options['__disableInit']);
         }
         // No supported writer-specific options are currently used; skip parent constructor if only internal config provided
         if ($options !== []) {
             parent::__construct($options); // will validate recognized set* methods if ever added
         }
-        $this->config = $internalConfig !== [] ? $internalConfig : $this->loadExtensionConfig();
+        $this->config = $hasInternalConfig ? $internalConfig : $this->loadExtensionConfig();
         $this->enabled = (bool)$this->getConfigValue('features.enable', true);
         $this->exceptionsOnly = (bool)$this->getConfigValue('filter.captureExceptionsOnly', false);
-        $this->enabledLevels = $this->enabled ? $this->parseList((string)$this->getConfigValue('filter.enabledLogLevels', 'error,critical,alert,emergency,warning')) : [];
+        $this->enabledLevels = $this->enabled ? $this->parseList((string)$this->getConfigValue('filter.enabledLogLevels', 'warning,error,critical,alert,emergency')) : [];
         $this->staticTags = $this->parsePairs((string)$this->getConfigValue('context.staticTags', ''));
         $this->staticExtras = $this->parsePairs((string)$this->getConfigValue('context.staticExtras', ''));
 
-        $disableInitForTests = (bool)$this->getConfigValue('testing.disableInit', false);
-
-        if ($this->enabled && !$disableInitForTests) {
+        if ($this->enabled && !$this->disableInit) {
             $client = SentrySdk::getCurrentHub()->getClient();
             if ($client === null) {
                 $dsn = (string)$this->getConfigValue('connection.dsn', \getenv('SENTRY_DSN') ?: '');
@@ -91,23 +100,16 @@ class SentryLogWriter extends AbstractWriter
                     $scope->setTag('typo3.request_id', $record->getRequestId());
                 }
                 foreach ($this->staticTags as $k => $v) {
-                    $scope->setTag($k, $v);
+                    $scope->setTag($k, $this->sanitizeTagValue($k, $v));
                 }
                 foreach ($this->staticExtras as $k => $v) {
-                    $scope->setExtra($k, $v);
+                    $scope->setExtra($k, $this->sanitizeExtraValue($k, $v));
                 }
                 foreach ($context as $key => $value) {
                     if ($key === 'exception') {
                         continue;
                     }
-                    if (\is_scalar($value) || $value === null) {
-                        $scope->setExtra((string)$key, $value);
-                    } elseif ($value instanceof \JsonSerializable) {
-                        $scope->setExtra((string)$key, $value->jsonSerialize());
-                    } else {
-                        $encoded = \json_encode($value);
-                        $scope->setExtra((string)$key, $encoded !== false ? $encoded : (string)$value);
-                    }
+                    $scope->setExtra((string)$key, $this->sanitizeExtraValue((string)$key, $value));
                 }
             });
 
@@ -117,7 +119,7 @@ class SentryLogWriter extends AbstractWriter
                 \Sentry\captureMessage($message, $severity);
             }
         } catch (\Throwable $e) {
-            // swallow
+            $this->reportInternalFailure('Failed to forward TYPO3 log record to Sentry', $e);
         }
         return $this;
     }
@@ -143,6 +145,7 @@ class SentryLogWriter extends AbstractWriter
             $cfg = $extConfig->get('sentry');
             return \is_array($cfg) ? $cfg : [];
         } catch (\Throwable $e) {
+            $this->reportInternalFailure('Failed to load Sentry extension configuration', $e);
             return [];
         }
     }
@@ -195,5 +198,77 @@ class SentryLogWriter extends AbstractWriter
             }
         }
         return $result;
+    }
+
+    private function sanitizeTagValue(string $key, string $value): string
+    {
+        if ($this->isSensitiveKey($key)) {
+            return self::REDACTED_VALUE;
+        }
+
+        return $value;
+    }
+
+    private function sanitizeExtraValue(string $key, mixed $value): mixed
+    {
+        if ($this->isSensitiveKey($key)) {
+            return self::REDACTED_VALUE;
+        }
+
+        return $this->sanitizeValue($value);
+    }
+
+    private function sanitizeValue(mixed $value, int $depth = 0): mixed
+    {
+        if ($depth >= self::MAX_SANITIZE_DEPTH) {
+            return '[TRUNCATED]';
+        }
+
+        if (\is_scalar($value) || $value === null) {
+            return $value;
+        }
+
+        if ($value instanceof \JsonSerializable) {
+            return $this->sanitizeValue($value->jsonSerialize(), $depth + 1);
+        }
+
+        if (\is_array($value)) {
+            $sanitized = [];
+            foreach ($value as $nestedKey => $nestedValue) {
+                $normalizedKey = \is_int($nestedKey) ? (string)$nestedKey : (string)$nestedKey;
+                $sanitized[$normalizedKey] = $this->sanitizeExtraValue($normalizedKey, $this->sanitizeValue($nestedValue, $depth + 1));
+            }
+
+            return $sanitized;
+        }
+
+        if ($value instanceof \Stringable) {
+            return '[object ' . $value::class . ']';
+        }
+
+        return '[object ' . $value::class . ']';
+    }
+
+    private function isSensitiveKey(string $key): bool
+    {
+        return (bool)\preg_match('/(?:^|[._\-])(pass(word)?|pwd|secret|token|api[_\-]?key|authorization|auth|cookie|set[_\-]?cookie|session|phpsessid|csrf|xsrf)(?:$|[._\-])/i', $key);
+    }
+
+    private function reportInternalFailure(string $message, ?\Throwable $exception = null): void
+    {
+        if (self::$reportingInternalFailure) {
+            return;
+        }
+
+        self::$reportingInternalFailure = true;
+
+        try {
+            $suffix = $exception === null ? '' : ': ' . $exception::class . ' - ' . $exception->getMessage();
+            \error_log('[honsa/sentry] ' . $message . $suffix);
+        } catch (\Throwable) {
+            // ignore secondary failure while reporting
+        } finally {
+            self::$reportingInternalFailure = false;
+        }
     }
 }

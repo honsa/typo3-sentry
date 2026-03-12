@@ -41,9 +41,8 @@ class ConfigurationTest extends TestCase
      */
     private function createWriter(array $config): SentryLogWriter
     {
-        // Mark that we are in a test context so SentryLogWriter skips Sentry::init()
-        $config['testing.disableInit'] = true;
-        return new SentryLogWriter(['__config' => $config]);
+        // Use an internal-only constructor flag so tests can skip Sentry::init()
+        return new SentryLogWriter(['__config' => $config, '__disableInit' => true]);
     }
 
     /**
@@ -299,21 +298,24 @@ class ConfigurationTest extends TestCase
     {
         $writer = $this->createWriter(['features.enable' => 1]);
         $levels = $this->getProperty($writer, 'enabledLevels');
-        // Default: error,critical,alert,emergency,warning
+        // Default: all PSR-3 levels
         self::assertIsArray($levels);
+        self::assertContains('debug', $levels);
+        self::assertContains('info', $levels);
+        self::assertContains('notice', $levels);
+        self::assertContains('warning', $levels);
         self::assertContains('error', $levels);
         self::assertContains('critical', $levels);
         self::assertContains('alert', $levels);
         self::assertContains('emergency', $levels);
-        self::assertContains('warning', $levels);
     }
 
     public function testFilterEnabledLogLevelsDefaultOrder(): void
     {
         $writer = $this->createWriter(['features.enable' => 1]);
         $levels = $this->getProperty($writer, 'enabledLevels');
-        // Verify all 5 default levels are present
-        self::assertCount(5, $levels);
+        // Verify all 8 PSR-3 levels are present by default
+        self::assertCount(8, $levels);
     }
 
     public function testFilterEnabledLogLevelsOnlyErrors(): void
