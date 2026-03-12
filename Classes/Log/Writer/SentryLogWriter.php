@@ -139,8 +139,8 @@ class SentryLogWriter extends AbstractWriter
         try {
             /** @var ExtensionConfiguration $extConfig */
             $extConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class);
-            // Read configuration using the extension key 'honsa_sentry'
-            $cfg = $extConfig->get('honsa_sentry');
+            // Read configuration using the extension key 'sentry'
+            $cfg = $extConfig->get('sentry');
             return \is_array($cfg) ? $cfg : [];
         } catch (\Throwable $e) {
             return [];

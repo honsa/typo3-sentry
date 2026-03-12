@@ -1,4 +1,4 @@
-# Sentry integration configuration for extension honsa_sentry
+# Sentry integration configuration for extension sentry
 # Each line annotated for Extension Manager rendering.
 
 # cat=features/enable; type=boolean; label=Enable Sentry log forwarding
@@ -6,22 +6,4 @@ features.enable = 1
 
 # cat=connection/dsn; type=string; label=Sentry DSN (leave empty to use env SENTRY_DSN)
 connection.dsn =
-# cat=connection/environment; type=string; label=Sentry environment (fallback env SENTRY_ENVIRONMENT or APP_ENV)
-connection.environment =
-# cat=connection/release; type=string; label=Release identifier (fallback env SENTRY_RELEASE)
-connection.release =
 
-# cat=sampling/tracesSampleRate; type=string; label=Tracing sample rate (0.0 - 1.0)
-sampling.tracesSampleRate = 0.0
-# cat=sampling/profilesSampleRate; type=string; label=Profiles sample rate (0.0 - 1.0)
-sampling.profilesSampleRate = 0.0
-
-# cat=filter/enabledLogLevels; type=string; label=Comma list of PSR-3 levels to send (debug,info,notice,warning,error,critical,alert,emergency)
-filter.enabledLogLevels = error,critical,alert,emergency,warning
-# cat=filter/captureExceptionsOnly; type=boolean; label=Only forward records that contain an exception in context
-filter.captureExceptionsOnly = 0
-
-# cat=context/staticTags; type=string; label=Static tags (semicolon key:value pairs e.g. region:eu;cluster:www)
-context.staticTags =
-# cat=context/staticExtras; type=string; label=Static extras (semicolon key:value pairs e.g. app:frontend;source:typo3)
-context.staticExtras =

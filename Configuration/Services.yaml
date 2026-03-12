@@ -1,13 +1,16 @@
 services:
-  Honsa\Sentry\Log\Writer\SentryLogWriter:
-    public: false
+  _defaults:
     autowire: true
     autoconfigure: true
-    tags:
-      - { name: 'kernel.event_listener', event: 'some.event.name', method: 'onKernelEvent' }
+    public: false
+  # Register all classes in the extension to be available for autowiring.
+  # Use the extension's PSR-4 namespace so TYPO3 can auto-register controllers and services.
+  Honsa\Sentry\:
+    resource: '../Classes/*'
+    exclude: '../Classes/{Domain,Tests,Resources}'
+  Honsa\Sentry\Log\Writer\SentryLogWriter:
+    public: false
 
-  # ...existing services...
-
-  # Add Swiper + infobox slider assets globally through an AssetCollector listener.
-  # The implementation lives in ext_localconf.php to avoid creating new PHP classes/files.
-  # This service entry is a no-op placeholder so the file changes remain minimal.
+  # Controller service registration so Extbase can resolve controllers from the DI container
+  Honsa\Sentry\Controller\TestController:
+    public: true

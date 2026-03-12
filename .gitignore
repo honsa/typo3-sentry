@@ -81,6 +81,9 @@ fabric.properties
 .phpunit.result.cache
 .phpunit.cache/**
 
+# PHPCSFixer
+.php-cs-fixer.cache
+
 # Build directory
 .Build/**
 

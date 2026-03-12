@@ -88,7 +88,7 @@ composer test:coverage
 
 Manual frontend test
 
-1. Ensure the extension is installed and active in TYPO3 (Extension Manager or `./vendor/bin/typo3 extension:activate honsa_sentry`).
+1. Ensure the extension is installed and active in TYPO3 (Extension Manager or `./vendor/bin/typo3 extension:activate sentry`).
 2. Set the DSN and environment for Sentry so the writer can initialize. Example (make sure these are visible to PHP-FPM/Apache):
 
 ```bash
@@ -102,7 +102,7 @@ export SENTRY_ENVIRONMENT="development"
 
 ```typoscript
 # example: include the plugin rendering
-tt_content.list.20.honsasentry_test =< plugin.tx_honsa_sentry_test
+tt_content.list.20.sentry_test =< plugin.tx_sentry_test
 ```
 
 4. Open the page in your browser and use the links in the "Sentry Test" plugin to trigger:

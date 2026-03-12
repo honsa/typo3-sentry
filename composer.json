@@ -1,6 +1,6 @@
 {
 	"name": "honsa/sentry",
-	"description": "TYPO3 extension providing a configurable custom LogWriter to forward logs to Sentry",
+	"description": "Sentry",
 	"type": "typo3-cms-extension",
 	"license": "MIT",
 	"require": {
@@ -28,7 +28,7 @@
 	},
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "honsa_sentry"
+			"extension-key": "sentry"
 		}
 	},
 	"minimum-stability": "dev",
@@ -37,9 +37,8 @@
 		"helhum/typo3-console": "For CLI clearing and diagnostics"
 	},
 	"scripts": {
-		"test": ".Build/bin/phpunit -c phpunit.xml.dist",
+		"test": "./run-tests.sh",
 		"test:unit": "@test",
-		"test:coverage": "XDEBUG_MODE=coverage .Build/bin/phpunit -c phpunit.xml.dist --coverage-text",
 		"phpstan": ".Build/bin/phpstan analyse --configuration=phpstan.neon Classes",
 		"analyze": "@phpstan",
 		"cs:lint": ".Build/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff --verbose Classes Tests",
