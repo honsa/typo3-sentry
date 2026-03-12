@@ -87,6 +87,6 @@ fabric.properties
 # Build directory
 .Build/**
 
-# Ignore composer.lock for extension
+# Ignore composer.lock
 composer.lock
 
