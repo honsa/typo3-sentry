@@ -1,4 +1,4 @@
-# Sentry integration configuration for extension sentry
+# Sentry integration configuration for extension sentry_logger
 # Each line annotated for Extension Manager rendering.
 
 # cat=features/enable; type=boolean; label=Enable Sentry log forwarding

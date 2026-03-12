@@ -13,7 +13,10 @@ Require the package via Composer and activate the extension in TYPO3:
 
 ```bash
 composer require honsa/sentry
+./vendor/bin/typo3 extension:activate sentry_logger
 ```
+
+TYPO3 extension key: `sentry_logger`
 
 ## Configuration (extension settings)
 

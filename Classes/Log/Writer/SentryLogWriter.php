@@ -18,7 +18,6 @@ class SentryLogWriter extends AbstractWriter
 {
     private const REDACTED_VALUE = '[REDACTED]';
     private const MAX_SANITIZE_DEPTH = 5;
-
     private HubInterface $hub;
     private array $config;
     private bool $enabled = true;
@@ -141,8 +140,7 @@ class SentryLogWriter extends AbstractWriter
         try {
             /** @var ExtensionConfiguration $extConfig */
             $extConfig = GeneralUtility::makeInstance(ExtensionConfiguration::class);
-            // Read configuration using the extension key 'sentry'
-            $cfg = $extConfig->get('sentry');
+            $cfg = $extConfig->get('sentry_logger');
             return \is_array($cfg) ? $cfg : [];
         } catch (\Throwable $e) {
             $this->reportInternalFailure('Failed to load Sentry extension configuration', $e);
@@ -264,7 +262,7 @@ class SentryLogWriter extends AbstractWriter
 
         try {
             $suffix = $exception === null ? '' : ': ' . $exception::class . ' - ' . $exception->getMessage();
-            \error_log('[honsa/sentry] ' . $message . $suffix);
+            \error_log('[honsa/sentry_logger] ' . $message . $suffix);
         } catch (\Throwable) {
             // ignore secondary failure while reporting
         } finally {

@@ -1,20 +1,24 @@
 <?php
 
-use TYPO3\CMS\Core\Log\LogManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+declare(strict_types=1);
+
+use Psr\Log\LogLevel;
+use Honsa\Sentry\Log\Writer\SentryLogWriter;
 
 defined('TYPO3') || die();
 
-$logger = GeneralUtility::makeInstance(LogManager::class)->getLogger('sentry');
+$writerConfiguration = $GLOBALS['TYPO3_CONF_VARS']['LOG']['writerConfiguration'] ?? [];
+$writerAlreadyConfigured = false;
 
-// Log levels
-$logger->emergency('Emergency', ['context' => 'data']);
-$logger->alert('Alert', ['context' => 'data']);
-$logger->critical('Critical', ['context' => 'data']);
-$logger->error('Error', ['context' => 'data']);
-$logger->warning('Warning', ['context' => 'data']);
-$logger->notice('Notice', ['context' => 'data']);
-$logger->info('Info', ['context' => 'data']);
-$logger->debug('Debug', ['context' => 'data']);
+foreach ($writerConfiguration as $writersForLevel) {
+	if (\is_array($writersForLevel) && \array_key_exists(SentryLogWriter::class, $writersForLevel)) {
+		$writerAlreadyConfigured = true;
+		break;
+	}
+}
+
+if (!$writerAlreadyConfigured) {
+	$GLOBALS['TYPO3_CONF_VARS']['LOG']['writerConfiguration'][LogLevel::DEBUG][SentryLogWriter::class] = [];
+}
 
 

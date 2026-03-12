@@ -28,7 +28,7 @@
 	},
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "sentry"
+			"extension-key": "sentry_logger"
 		}
 	},
 	"minimum-stability": "dev",
