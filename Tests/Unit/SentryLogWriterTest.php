@@ -23,6 +23,14 @@ class SentryLogWriterTest extends TestCase
 
     private function make(array $cfg): SentryLogWriter
     {
+        // Prevent the writer from calling \Sentry\init() during unit tests by
+        // defaulting testing.disableInit to true unless the test explicitly
+        // provides the flag (either as flat key or nested array).
+        if (!array_key_exists('testing.disableInit', $cfg)) {
+            if (!(isset($cfg['testing']) && is_array($cfg['testing']) && array_key_exists('disableInit', $cfg['testing']))) {
+                $cfg['testing.disableInit'] = true;
+            }
+        }
         return new SentryLogWriter(['__config' => $cfg]);
     }
 
@@ -31,17 +39,19 @@ class SentryLogWriterTest extends TestCase
         $writer = $this->make(['features' => ['enable' => 0]]);
         $record = new LogRecord('test', LogLevel::ERROR, 'Message');
         self::assertSame($writer, $writer->writeLog($record));
-        $ref = new \ReflectionProperty($writer, 'enabled');
-        $ref->setAccessible(true);
-        self::assertFalse($ref->getValue($writer));
+        $getter = \Closure::bind(function (string $name) {
+            return $this->$name;
+        }, $writer, get_class($writer));
+        self::assertFalse($getter('enabled'));
     }
 
     public function testLevelFiltering(): void
     {
         $writer = $this->make(['features' => ['enable' => 1], 'filter' => ['enabledLogLevels' => 'error,critical']]);
-        $levels = new \ReflectionProperty($writer, 'enabledLevels');
-        $levels->setAccessible(true);
-        self::assertSame(['error', 'critical'], $levels->getValue($writer));
+        $getter = \Closure::bind(function (string $name) {
+            return $this->$name;
+        }, $writer, get_class($writer));
+        self::assertSame(['error', 'critical'], $getter('enabledLevels'));
         $writer->writeLog(new LogRecord('test', LogLevel::ERROR, 'Err'));
         $writer->writeLog(new LogRecord('test', LogLevel::INFO, 'Info'));
         self::assertTrue(true);

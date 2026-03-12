@@ -4,6 +4,9 @@
 # cat=features/enable; type=boolean; label=Enable Sentry log forwarding
 features.enable = 1
 
+# cat=features/enableTestPlugin; type=boolean; label=Enable test plugin (frontend/backend test UI)
+features.enableTestPlugin = 0
+
 # cat=connection/dsn; type=string; label=Sentry DSN (leave empty to use env SENTRY_DSN)
 connection.dsn =
 
