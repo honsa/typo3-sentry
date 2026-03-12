@@ -1,0 +1,14 @@
+{namespace f=TYPO3\CMS\Fluid\ViewHelpers}
+<f:layout name="Default" />
+<f:section name="Main">
+    <h1>Sentry Test</h1>
+    <ul>
+        <li><f:link.action action="triggerException">Trigger Exception</f:link.action></li>
+        <li><f:link.action action="triggerUserError">Trigger User Error</f:link.action></li>
+        <li><f:link.action action="triggerWarning">Trigger Warning</f:link.action></li>
+        <li><f:link.action action="triggerNotice">Trigger Notice</f:link.action></li>
+        <li><f:link.action action="triggerCritical">Trigger Critical (log)</f:link.action></li>
+        <li><f:link.action action="triggerEmergency">Trigger Emergency (log)</f:link.action></li>
+        <li><f:link.action action="logMessages">Log multiple messages</f:link.action></li>
+    </ul>
+</f:section>

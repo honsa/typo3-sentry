@@ -1,0 +1,17 @@
+plugin.tx_honsa_sentry_test {
+  view {
+    templateRootPaths {
+      0 = EXT:honsa_sentry/Resources/Private/Templates/
+    }
+    partialRootPaths {
+      0 = EXT:honsa_sentry/Resources/Private/Partials/
+    }
+    layoutRootPaths {
+      0 = EXT:honsa_sentry/Resources/Private/Layouts/
+    }
+  }
+}
+
+# Make plugin non-cacheable by default for testing
+config.tx_extbase.persistence.enable_auto_namespace_resolution = 1
+

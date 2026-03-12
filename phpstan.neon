@@ -1,0 +1,5 @@
+parameters:
+    customRulesetUsed: true
+
+includes:
+    - .Build/vendor/friendsoftypo3/phpstan-typo3/extension.neon

@@ -1,0 +1,13 @@
+services:
+  Honsa\Sentry\Log\Writer\SentryLogWriter:
+    public: false
+    autowire: true
+    autoconfigure: true
+    tags:
+      - { name: 'kernel.event_listener', event: 'some.event.name', method: 'onKernelEvent' }
+
+  # ...existing services...
+
+  # Add Swiper + infobox slider assets globally through an AssetCollector listener.
+  # The implementation lives in ext_localconf.php to avoid creating new PHP classes/files.
+  # This service entry is a no-op placeholder so the file changes remain minimal.
