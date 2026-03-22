@@ -11,7 +11,7 @@ $EM_CONF[$_EXTKEY] = [
     'author_company' => 'Honsa',
     'state' => 'beta',
     'clearCacheOnLoad' => 0,
-    'version' => '1.0.8',
+    'version' => '1.0.9',
     'constraints' => [
         'depends' => [
             'typo3' => '13.4.0-14.99.99',
@@ -21,4 +21,3 @@ $EM_CONF[$_EXTKEY] = [
         'suggests' => [],
     ],
 ];
-
