@@ -46,7 +46,7 @@
   "scripts": {
     "test": "./run-tests.sh",
     "test:unit": "@test",
-    "phpstan": ".Build/bin/phpstan analyse --configuration=phpstan.neon Classes",
+    "phpstan": ".Build/bin/phpstan analyse --configuration=.phpstan.neon Classes",
     "analyze": "@phpstan",
     "cs:lint": ".Build/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff --verbose Classes Tests",
     "cs:fix": ".Build/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose Classes Tests"
