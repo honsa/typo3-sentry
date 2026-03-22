@@ -170,14 +170,6 @@ class SentryLogWriter extends AbstractWriter
         return $value;
     }
 
-    /**
-     * @deprecated Use getConfigValue() instead. Kept for backward compatibility.
-     */
-    private function cfg(string $path, mixed $default = null): mixed
-    {
-        return $this->getConfigValue($path, $default);
-    }
-
     private function parseList(string $raw): array
     {
         return \array_filter(\array_map('trim', \explode(',', \strtolower($raw))));
@@ -233,16 +225,13 @@ class SentryLogWriter extends AbstractWriter
         if (\is_array($value)) {
             $sanitized = [];
             foreach ($value as $nestedKey => $nestedValue) {
-                $normalizedKey = \is_int($nestedKey) ? (string)$nestedKey : (string)$nestedKey;
+                $normalizedKey = (string)$nestedKey;
                 $sanitized[$normalizedKey] = $this->sanitizeExtraValue($normalizedKey, $this->sanitizeValue($nestedValue, $depth + 1));
             }
 
             return $sanitized;
         }
 
-        if ($value instanceof \Stringable) {
-            return '[object ' . $value::class . ']';
-        }
 
         return '[object ' . $value::class . ']';
     }
